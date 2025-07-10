@@ -13,17 +13,21 @@
 # limitations under the License.
 """Base class for code model."""
 
+from pay_api.utils.db_retry import db_retry
+
 
 class CodeTable:  # pylint: disable=too-few-public-methods
     """This class provides base methods for Code Table."""
 
     @classmethod
+    @db_retry(max_retries=3, delay=0.5, backoff=2.0)
     def find_by_code(cls, code):
         """Given a code, this will return code master details."""
         code_table = cls.query.filter_by(code=code).one_or_none()  # pylint: disable=no-member
         return code_table
 
     @classmethod
+    @db_retry(max_retries=3, delay=0.5, backoff=2.0)
     def find_all(cls):
         """Return all of the code master details."""
         codes = cls.query.all()  # pylint: disable=no-member

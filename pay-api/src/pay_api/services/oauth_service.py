@@ -92,8 +92,22 @@ class OAuthService:
             current_app.logger.error(
                 f"HTTPError on POST with status code {exc.response.status_code if exc.response is not None else ''}"
             )
-            if exc.response and exc.response.status_code >= 500:
-                raise ServiceUnavailableException(exc) from exc
+            
+            # Handle specific HTTP errors with appropriate actions
+            if exc.response:
+                status_code = exc.response.status_code
+                if status_code == 413:
+                    current_app.logger.error("Request Entity Too Large - consider implementing request chunking")
+                    # Log the request size for analysis
+                    if data:
+                        data_size = len(str(data)) if isinstance(data, (str, dict)) else len(data)
+                        current_app.logger.error(f"Request data size: {data_size} bytes")
+                elif status_code >= 500:
+                    current_app.logger.error("Server error - external service may be experiencing issues")
+                    raise ServiceUnavailableException(exc) from exc
+                elif status_code == 400:
+                    current_app.logger.warning("Bad Request - check request format and parameters")
+            
             raise exc
         finally:
             OAuthService.__log_response(response)

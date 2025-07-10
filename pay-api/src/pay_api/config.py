@@ -100,6 +100,21 @@ class _Config:  # pylint: disable=too-few-public-methods
     else:
         SQLALCHEMY_DATABASE_URI = f"postgresql+pg8000://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
+    # Database connection pool configuration to handle network issues
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_size": int(_get_config("SQLALCHEMY_POOL_SIZE", default="10")),
+        "max_overflow": int(_get_config("SQLALCHEMY_MAX_OVERFLOW", default="20")),
+        "pool_pre_ping": True,  # Enable connection health checks
+        "pool_recycle": int(_get_config("SQLALCHEMY_POOL_RECYCLE", default="3600")),  # 1 hour
+        "pool_timeout": int(_get_config("SQLALCHEMY_POOL_TIMEOUT", default="30")),
+        "echo": SQLALCHEMY_ECHO,
+        "echo_pool": _get_config("SQLALCHEMY_ECHO_POOL", default="False").lower() == "true",
+        "connect_args": {
+            "connect_timeout": int(_get_config("DATABASE_CONNECT_TIMEOUT", default="10")),
+            "options": "-c timezone=utc"
+        }
+    }
+
     # JWT_OIDC Settings
     JWT_OIDC_WELL_KNOWN_CONFIG = _get_config("JWT_OIDC_WELL_KNOWN_CONFIG")
     JWT_OIDC_ALGORITHMS = _get_config("JWT_OIDC_ALGORITHMS")

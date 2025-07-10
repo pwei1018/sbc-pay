@@ -134,3 +134,8 @@ ACK.INBOX*
 FEEDBACK.INBOX*
 *.env
 pay-admin/flask_session/
+pay-api/src/pay_api/utils/error_monitor.py
+pay-api/production_health_monitor.py
+pay-api/PRODUCTION_ERROR_RESOLUTION_REPORT.md
+pay-api/enhanced_pay_api_analyzer.py
+pay-api/enhanced_pay_api_analysis_20250710_092441.json
